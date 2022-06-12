@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Folded Faces High Resolution</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            body {
+                background-color: black;
+                color: white;
+                font-family: monospace;
+                font-size: 20px;
+                text-align: center;
+            }
+            h1 { font-size: 30px; }
+            input:hover:enabled, button:hover:enabled {
+                border-width:2px;
+                padding:1px;
+            }
+            input, button  {
+                font-family: monospace;
+                color:white;
+                font-size:20px;
+                border-width:1px;
+                padding:2px; 
+                border-color: white;
+                background-color:black;
+                color:inherit;
+                height: 37px;
+                border-radius: 7px;
+                display: inline-block;
+                box-sizing: border-box;
+                border-style: outset;
+            }
+            #idInput:invalid { border-color: red; }
+            input:focus { outline-width: 0; }
+            #idInput { width:110px; }
+            #download { width:220px; }
+            #download:disabled { border-color: grey; }
+            #loading { display:none; }
+        </style>
+    </head>
+    <body>
+        <h1>Folded Faces High Resolution</h1>
+        <label for="idInput">Token ID:</label>
+        <input id="idInput" type="number" value="0" min="0" max="299">
+        <br><br>
+        <button id="download" type="button">Download</button>
+        <br><br>
+        <div id="loading">This might take a while...</div>
+        <script>
+            // Download when the button is clicked
+            var idInput = document.getElementById("idInput");
+            var download = document.getElementById("download");
+            var loading = document.getElementById("loading");
+            download.onclick = function() {
+                var id = parseInt(idInput.value);
+                if (id >= parseInt(idInput.getAttribute("min")) && id <= parseInt(idInput.getAttribute("max"))) {
+                    download.textContent = "Downloading...";
+                    download.disabled = true;
+                    loading.style.display = "block";
+                    buffer = null;
+                    get(id, "https://raw.githubusercontent.com/octal-crypto/folded-faces-high-resolution/main/data/"+id+".aa");
+                }
+            }
+
+            // Images are split across multiple files. Download and concatenate each.
+            function get(id, url) {
+                var req = new XMLHttpRequest();
+                req.open("GET", url);
+                req.responseType = "arraybuffer";
+                req.onload = function() {
+                    if (req.status == 200) {
+                        if (buffer == null) buffer = req.response; // First file
+                        else {
+                            // Concatenate the new file
+                            var array = new Uint8Array(buffer.byteLength + req.response.byteLength);
+                            array.set(new Uint8Array(buffer), 0);
+                            array.set(new Uint8Array(req.response), buffer.byteLength);
+                            buffer = array.buffer;
+                        }
+
+                        // Get the next file
+                        get(id, url.slice(0,-1) + String.fromCharCode(url.charCodeAt(url.length-1)+1));
+
+                    } else if (req.status == 404) {
+                        // All files have been downloaded
+                        loading.style.display = "none";
+                        var blob = new Blob([buffer]);
+                        var fileName = id + ".png";
+
+                        if (typeof window.navigator.msSaveBlob === 'undefined') {
+                            // Modern browsers support downloading links
+                            // https://caniuse.com/download
+                            var link = document.createElement("a");
+                            link.href = URL.createObjectURL(blob);
+                            link.download = fileName;
+                            link.click();
+                            URL.revokeObjectURL(link.href);
+                        } else { window.navigator.msSaveBlob(blob, fileName) } // IE support
+
+                        download.textContent = "Download";
+                        download.disabled = false;
+                    }
+                }
+                req.send(null);
+            }
+        </script>
+    </body>
+</html>
