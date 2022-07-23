@@ -11,8 +11,11 @@
                 font-family: monospace;
                 font-size: 20px;
                 text-align: center;
+                padding-top: 10px;
             }
-            h1 { font-size: 30px; }
+            a { text-decoration: none; color: white; }
+            a:hover { text-decoration: underline; }
+            a, h1 { font-size: 30px; font-weight: bold; display: inline; }
             input:hover:enabled, button:hover:enabled {
                 border-width:2px;
                 padding:1px;
@@ -41,7 +44,9 @@
         </style>
     </head>
     <body>
-        <h1>Folded Faces High Resolution</h1>
+        <a href="https://opensea.io/collection/foldedfaces">Folded Faces</a>
+        <h1>High Resolution</h1>
+        <br><br>
         <label for="idInput">Token ID:</label>
         <input id="idInput" type="number" value="0" min="0" max="299">
         <br><br>
