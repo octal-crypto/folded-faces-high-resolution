@@ -12,10 +12,10 @@ Alternatively, use `get-images.sh` to generate PNGs for all pieces. Or combine t
 
 Windows cmd:
 ```cmd
-type 0.aa 0.ab 0.ac > 0.png
+type 103.aa 103.ab 103.ac > 103.png
 ```
 
 Linux/Mac:
 ```sh
-cat 0.aa 0.ab 0.ac > 0.png
+cat 103.aa 103.ab 103.ac > 103.png
 ```
